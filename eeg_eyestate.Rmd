@@ -90,7 +90,13 @@ vizser(1,14,eegclean,"orange")
 ```
 ```{r}
 #data looks better but long tails
-#quantify by calculating skew & curtosis
-
+#quantify by calculating skew & kurtosis for each 
+print("sensor  skew   kurt")
+for(i in 1:14){
+  out <- c(colnames(eegclean[i]),
+           round(skewness(eegclean[,i]),2),
+           round(kurtosis(eegclean[,i]),2))
+  print(out)
+  }
 ```
 

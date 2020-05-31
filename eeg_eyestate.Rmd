@@ -1,0 +1,96 @@
+---
+title: "EEG eyeblink detection"
+output: html_notebook
+---
+
+```{r}
+#load libraries
+library(foreign)
+library(car)
+library(fBasics)
+library(caret)
+library(corrplot)
+library(randomForest)
+library(e1071)
+library(nnet)
+library(ROCR)
+library(pROC)
+library(gbm)
+library(plyr)
+library(kknn)
+library(rpart)
+```
+
+```{r}
+#Load data set from UCI repository
+eegdat <- read.arff(("https://archive.ics.uci.edu/ml/machine-learning-databases/00264/EEG%20Eye%20State.arff"))
+dim(eegdat)
+head(eegdat)
+```
+```{r}
+#explore data
+str(eegdat)
+```
+```{r}
+#summarize data
+summary(eegdat)
+```
+```{r}
+#function for visualizing attributes
+vizser <- function(x,y,z,c){
+  par(mar = c(2,2,2,2))
+  par(mfrow = c(2,2))
+  for(i in x:y){
+    temp1 <- unlist(z[i])
+    hist(temp1, col = c, xlab = "", main = 
+           paste(colnames(z[i])))
+    boxplot(temp1, col = c, xlab = "", main =
+              paste(colnames(z[i])))
+  }
+}
+
+#visualize raw data
+par(mar = c(2,2,2,2))
+par(mfrow = c(2,2))
+vizser(1,14,eegdat,"cyan")
+```
+```{r}
+#there are definite outliers in raw data
+#find/remove outlier cases
+#to do this generate zscores, remove instances with values +/- 4sds
+eegdatz <- eegdat
+eegdatz[c(1:14)] <- lapply(eegdatz[c(1:14)], function(x) c(scale(x, center = TRUE, scale = TRUE)))
+eegdatz$ID <- seq.int(nrow(eegdatz))
+head(eegdatz)
+```
+```{r}
+#Identify rows with outliers: values +/- 4SDs
+for(i in 1:14){
+  nam <- paste("r", i, sep = "")
+  out <- eegdatz[i] >=4 | eegdatz[i] <= -4
+  out2 <- eegdatz$ID[out]
+  assign(nam, out2)
+}
+out_all <- sort(unique(c(r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14)))
+out_all
+```
+```{r}
+#view rows with outliers
+eegout <-eegdatz[out_all,]
+eegout
+```
+```{r}
+#Remove rows with outliers from raw data
+eegclean <- eegdat[-(out_all),]
+summary(eegclean)
+```
+```{r}
+#Visualise cleaned data: histograms & boxplots
+vizser(1,14,eegclean,"orange")
+```
+```{r}
+#data looks better but long tails
+#quantify by calculating skew & curtosis
+
+```
+

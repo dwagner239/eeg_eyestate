@@ -107,6 +107,14 @@ skrt <- function(x){
 skrt(eegclean)
 
 ```
-```
+```{r}
+#Try log transformation 
+eegclean_log <- log(eegclean[1:14])
+head(eegclean_log)
+summary(eegclean_log)
 
+#visualize log transform
+vizser(1,14,eegclean_log,"red")
+skrt(eegclean_log)
+```
 

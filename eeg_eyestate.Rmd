@@ -90,26 +90,23 @@ vizser(1,14,eegclean,"orange")
 ```
 
 ```{r}
-#data looks better but long tails
-#quantify by calculating skew and kurtosis
-clean_sk <- data.frame(sensor = character(),
-                       skew = integer(),
-                       kurt = integer(),
-                       stringsAsFactors = FALSE)
-
 #function to return skew & kurtosis values
-skrt <- function(x, y){
+skrt <- function(x){
     for(i in 1:ncol(x)){
       if(is.factor(x[,i])){
         next
         } else {
-          y[nrow(y) + 1, 1:3] <- list(sensor = colnames(x[i]),
-                                      skew = round(skewness(x[,i]),2),
-                                      kurt = round(kurtosis(x[,i]),2))
+           otpt <- c(colnames(x[i]),
+                     round(skewness(x[,i]),2),
+                     round(kurtosis(x[,i]),2))
+           print(otpt)
           }
     }
-  return(y)
-  }
+  #return(data.frame(y))
+}
+skrt(eegclean)
+
+```
 ```
 
 

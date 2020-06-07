@@ -108,13 +108,62 @@ skrt(eegclean)
 
 ```
 ```{r}
-#Try log transformation 
-eegclean_log <- log(eegclean[1:14])
-head(eegclean_log)
-summary(eegclean_log)
-
-#visualize log transform
-vizser(1,14,eegclean_log,"red")
-skrt(eegclean_log)
+#Spearman correlation
+eegcor <- round(cor(eegclean[1:14], method = "spearman"),2)
+eegcor
+eegcor_p <-cor.mtest(eegclean[1:14], method = "spearman", exact = NULL)
+corrplot(eegcor, type = "lower", tl.col = "black",main = "Spearman Correlations", p.mat = eegcor_p$p, sig.level =  .05, insig = "blank", tl.srt = 45)
 ```
+```{r}
+#function to graph cleaned EEG signal by corresponding pairs
+#differentiate eyes open/closed periods with blue bars in background
+eegpairs <- function(x,y){
+  ylim_min <- pmin(min(x), min(y))-50
+  ylim_max <- pmax(max(x), max(y))+100
+  xnam <- deparse(substitute(x))
+  ynam <- deparse(substitute(y))
+  xnam1 <- substring(xnam, regexpr("[$]", xnam)+1)
+  ynam1 <- substring(ynam, regexpr("[$]", ynam)+1)
+  plot(x, type = "l", col = "orange", ylim = range(c(ylim_min,ylim_max)), xlab = "Time", ylab = "Signal Amplitude")
+  lines(y, type = "l", col = "olivedrab")
+  legend(0,ylim_max, legend = c(paste0(xnam1), paste0(ynam1)), lwd = c(5,5), col = c("orange", "olivedrab"),bty = "n")
+  xlft <- c(189, 1337, 2177, 2901, 3343, 5245, 6654, 11106, 12729, 12977, 14218, 14960)
+  xrgt <- c(872, 1638, 2633, 2927, 4352, 5928, 9054, 12076, 12771, 13028, 14289, 14980)
+  rect(xlft, ylim_min, xrgt, ylim_max, col = rgb(0,0,1.0, alpha=0.1), border = NA)
+}
+```
+```{r}
+#generate graphs for corresponding r/l sensor pairs
+#using new 'eegpairs' function
+eegpairs(eegclean$AF3, eegclean$AF4)
+eegpairs(eegclean$F7, eegclean$F8)
+eegpairs(eegclean$F3, eegclean$F4)
+eegpairs(eegclean$FC5, eegclean$FC6)
+eegpairs(eegclean$T7, eegclean$T8)
+eegpairs(eegclean$P7, eegclean$P8)
+eegpairs(eegclean$O1, eegclean$O2)
+```
+```{r}
+#Apply index number to rows
+eegclean$ID <- seq.int(nrow(eegclean))
+summary(eegclean)
+
+#Create train/test data sets
+#Reserve 20% to test and 80% to train
+set.seed(45)
+indx <- createDataPartition(eegclean$ID, p = 0.8, list = FALSE)
+train_data <- eegclean[indx,1:15]
+test_data <- eegclean[-indx,1:15]
+head(train_data)
+head(test_data)
+
+#Center/Scale train set, apply same process to test set
+preproc <- preProcess(train_data, method = c("center", "scale"))
+prep_train <- predict(preproc, train_data)
+prep_test <- predict(preproc, test_data)
+head(prep_train)
+head(prep_test)
+
+```
+
 

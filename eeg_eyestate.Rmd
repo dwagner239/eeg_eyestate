@@ -165,5 +165,49 @@ head(prep_train)
 head(prep_test)
 
 ```
+```{r}
+#Create dataframe to store statistics from test set
+best_models <- data.frame(modname = character(),
+                          accuracy = integer(),
+                          sensitiv = integer(),
+                          specific = integer(),
+                          precis = integer(),
+                          f1 = integer(),
+                          stringsAsFactors = FALSE
+                          )
+
+#function to record outcome variables
+cm_out <- function(x,z){
+  #round outcome vars and order in a list
+  acc <- round(x$overall[1],4)
+  sen <- round(x$byClass[1],4)
+  spc <- round(x$byClass[2],4)
+  prc <- round(x$byClass[5],4)
+  ef1 <- round(x$byClass[7],4)
+  
+  y <- c(z, acc, sen, spc, prc, ef1)
+  return(y)
+}
+
+#use Caret package to train models
+#all models trained using same settings
+trncntl <- trainControl(method = "repeatedcv", number = 10, verboseIter = FALSE, repeats = 3)
+
+#log regression model
+set.seed(42)
+glm_formula <- train(eyeDetection ~., data = prep_train, 
+                      method = "glm", family = "binomial",
+                      trControl = trncntl, tuneLength = 10)
+print(glm_formula)
+pred_glm <- predict(glm_formula, newdata = prep_test, probility = TRUE)
+cm_glm <- confusionMatrix(pred_glm, prep_test$eyeDetection)
+print(cm_glm)
+
+glm_out <- cm_out(cm_glm, "regression")
+rm_out <- cm_out(cm_glm, "regression")
+
+best_models[nrow(best_models)+1,] <- glm_out
+
+```
 
 

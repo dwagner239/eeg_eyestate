@@ -224,4 +224,18 @@ dt_out <- cm_out(cm_dt, "d.tree")
 
 best_models[nrow(best_models)+1,] <- dt_out
 ```
+```{r}
+# best RF model
+set.seed(42)
+rf_omni_trf <- tuneRF(prep_train[1:14], prep_train$eyeDetection, stepFactor = .5, doBest = TRUE)
+pred_tunerf <- predict(rf_omni_trf, prep_test)
+cm_tunerf <- confusionMatrix(pred_tunerf, prep_test$eyeDetection)
+print(cm_tunerf)
+
+rf_out <- cm_out(cm_tunerf, "rand.forest")
+
+best_models[nrow(best_models)+1,] <- rf_out
+```
+
+
 

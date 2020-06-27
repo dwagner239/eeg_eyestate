@@ -204,10 +204,24 @@ cm_glm <- confusionMatrix(pred_glm, prep_test$eyeDetection)
 print(cm_glm)
 
 glm_out <- cm_out(cm_glm, "regression")
-rm_out <- cm_out(cm_glm, "regression")
 
 best_models[nrow(best_models)+1,] <- glm_out
 
+best_models
 ```
+```{r}
+# CART decision tree
+set.seed(42)
+dt_formula <- train(eyeDetection ~., data = prep_train, 
+                    method = "rpart",trControl = trncntl, 
+                    tuneLength = 10)
+print(dt_formula)
+pred_dt <- predict(dt_formula, newdata = prep_test)
+cm_dt <- confusionMatrix(pred_dt, prep_test$eyeDetection)
+print(cm_dt)
 
+dt_out <- cm_out(cm_dt, "d.tree")
+
+best_models[nrow(best_models)+1,] <- dt_out
+```
 

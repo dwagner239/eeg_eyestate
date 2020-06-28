@@ -237,5 +237,27 @@ rf_out <- cm_out(cm_tunerf, "rand.forest")
 best_models[nrow(best_models)+1,] <- rf_out
 ```
 
+```{r}
+# best neural network
+set.seed(42)
+nn_grid <- expand.grid(size = c(40), decay = c(.35))
+nn_formula = train(eyeDetection ~ ., 
+                    data = prep_train, 
+                    method = "nnet",
+                    trControl=trncntl, 
+                    tuneGrid = nn_grid5
+                    )
+print(nn_formula)
+pred_nn <- predict(nn_formula, newdata = prep_test)
+cm_nn <- confusionMatrix(pred_nn, prep_test$eyeDetection)
+print(cm_nn)
 
+nn_out <- cm_out(cm_nn, "n.network")
+
+best_models[nrow(best_models)+1,] <- nn_out
+```
+
+```{r}
+
+```
 

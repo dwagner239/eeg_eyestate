@@ -1,6 +1,8 @@
 ---
 title: "EEG eyeblink detection"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r}
@@ -236,6 +238,72 @@ rf_out <- cm_out(cm_tunerf, "rand.forest")
 
 best_models[nrow(best_models)+1,] <- rf_out
 ```
+
+```{r}
+# best neural network
+set.seed(42)
+nn_grid <- expand.grid(size = c(40), decay = c(.35))
+nn_formula = train(eyeDetection ~ ., 
+                    data = prep_train, 
+                    method = "nnet",
+                    trControl=trncntl, 
+                    tuneGrid = nn_grid5
+                    )
+print(nn_formula)
+pred_nn <- predict(nn_formula, newdata = prep_test)
+cm_nn <- confusionMatrix(pred_nn, prep_test$eyeDetection)
+print(cm_nn)
+
+nn_out <- cm_out(cm_nn, "n.network")
+
+best_models[nrow(best_models)+1,] <- nn_out
+```
+
+```{r}
+# best SVM
+set.seed(42)
+svm_grid <- expand.grid(sigma = c(.26), C = c(32.0))
+svm_formula <- train(eyeDetection ~., 
+                      data = prep_train, 
+                      method = "svmRadial", 
+                      trControl = trncntl, 
+                      tuneGrid = svm_grid)
+print(svm_formula)
+pred_svm <- predict(svm_formula, newdata = prep_test)
+cm_sv <- confusionMatrix(pred_svm, prep_test$eyeDetection)
+print(cm_sv)
+
+svm_out <- cm_out(cm_sv, "SVM")
+
+best_models[nrow(best_models)+1,] <- svm_out 
+```
+
+```{r}
+#KNN with kernel weighting (KKNN) -- Best model
+set.seed(42)
+knn_grid <- expand.grid(kmax = c(13),
+                         distance = 2,
+                         kernel = "triweight"
+                         )
+knn_formula <- train(eyeDetection ~.,
+                      data = prep_train, 
+                      method = "kknn", 
+                      trControl = trncntl,
+                      tuneGrid = knn_grid)
+print(knn_formula)
+pred_knn <- predict(knn_formula, newdata = prep_test)
+cm_knn <- confusionMatrix(pred_knn, prep_test$eyeDetection)
+print(cm_knn)
+
+knn_out <- cm_out(cm_knn, "KKNN")
+
+best_models[nrow(best_models)+1,] <- knn_out
+```
+
+```{r}
+best_models
+```
+
 
 
 

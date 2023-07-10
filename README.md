@@ -8,5 +8,7 @@ In my work with the dataset, after performing EDA tasks such as visualizing the 
 
 While I was able to achieve equivalent performance as the authors using a better-known, more easily understandable algorithm, this also comes with some caveats. Ideally, identification of eye state would occur in a “just-in-time” application operating with continuous data. In this use case, centering and standardizing the set would not be possible and other ways of filtering outliers would need to be explored.
 
+[![EmotivEEG](https://github.com/dwagner239/eeg_eyestate/blob/master/emotivEEG.jpg)]
+
 Rösler, O., & Suendermann, D. (2013). A first step towards eye state prediction using EEG. Proc. of the AIHLS, 1, 1-4. (http://www.oeft.com/su/pdf/aihls2013.pdf)
 EEG Eye State dataset available at https://archive.ics.uci.edu/dataset/264/eeg+eye+state
